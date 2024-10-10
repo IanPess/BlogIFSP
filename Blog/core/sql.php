@@ -1,67 +1,74 @@
 <?php
-    function insert(string $entidade, array $dados) : string {
-        $instrucao = "INSERT INTO {$entidade}";
+function insert(string $entidade, array $dados) : string {
+    // Cria a instrução SQL para inserção
+    $instrucao = "INSERT INTO {$entidade}";
 
-        $campos = implode(', ', array_keys($dados));
-        $valores = implode(', ', array_values($dados));
+    // Extrai os campos e valores da array $dados
+    $campos = implode(', ', array_keys($dados));
+    $valores = implode(', ', array_values($dados));
 
-        $instrucao .= " ({$campos})";
-        $instrucao .= " VALUES ({$valores})";
+    // Monta a instrução SQL completa
+    $instrucao .= " ({$campos})";
+    $instrucao .= " VALUES ({$valores})";
 
-        return $instrucao;
+    return $instrucao; // Retorna a instrução SQL
+}
+
+function update(string $entidade, array $dados, array $criterio = []) : string {
+    // Cria a instrução SQL para atualização
+    $instrucao = "UPDATE {$entidade}";
+
+    // Monta a parte SET da instrução SQL
+    foreach($dados as $campo => $dado) {
+        $set[] = "{$campo} = {$dado}"; // Adiciona cada campo e seu novo valor
     }
 
-    function update(string $entidade, array $dados, array $criterio = []) : string {
-        $instrucao = "UPDATE {$entidade}";
+    $instrucao .= ' SET ' . implode(', ', $set); // Adiciona a parte SET à instrução
 
-        foreach($dados as $campo => $dado) {
-            $set[] = "{$campo} = {$dado}";
+    // Adiciona a cláusula WHERE, se houver critérios
+    if(!empty($criterio)){
+        $instrucao .= ' WHERE ';
+        foreach($criterio as $expressao) {
+            $instrucao .= ' ' . implode(' ', $expressao); // Monta a cláusula WHERE
         }
-
-        $instrucao .= ' SET ' . implode(', ', $set);
-
-        if(!empty($criterio)){
-            $instrucao .= ' WHERE ';
-
-            foreach($criterio as $expressao) {
-                $instrucao .= ' ' . implode(' ', $expressao);
-            }
-        }
-
-        return $instrucao;
     }
 
-    function delete(string $entidade, array $criterio = []) {
-        $instrucao = "DELETE FROM {$entidade}";
+    return $instrucao; // Retorna a instrução SQL
+}
 
-        if(!empty($criterio)) {
-            $instrucao .= ' WHERE ';
+function delete(string $entidade, array $criterio = []) {
+    // Cria a instrução SQL para deleção
+    $instrucao = "DELETE FROM {$entidade}";
 
-            foreach($criterio as $expressao) {
-                $instrucao .= ' ' . implode(' ', $expressao);
-            }
+    // Adiciona a cláusula WHERE, se houver critérios
+    if(!empty($criterio)) {
+        $instrucao .= ' WHERE ';
+        foreach($criterio as $expressao) {
+            $instrucao .= ' ' . implode(' ', $expressao); // Monta a cláusula WHERE
         }
-
-        return $instrucao;
     }
 
-    function select(string $entidade, array $campos, array $criterio = [], string
-    $ordem = null) : string {
-        $instrucao = "SELECT " . implode(', ' , $campos);
-        $instrucao .= " FROM {$entidade}";
-        
-        if(!empty($criterio)) {
-            $instrucao .= ' WHERE ';
+    return $instrucao; // Retorna a instrução SQL
+}
 
-            foreach($criterio as $expressao) {
-                $instrucao .= ' ' . implode(' ', $expressao);
-            }
+function select(string $entidade, array $campos, array $criterio = [], string $ordem = null) : string {
+    // Cria a instrução SQL para seleção de dados
+    $instrucao = "SELECT " . implode(', ', $campos);
+    $instrucao .= " FROM {$entidade}";
+
+    // Adiciona a cláusula WHERE, se houver critérios
+    if(!empty($criterio)) {
+        $instrucao .= ' WHERE ';
+        foreach($criterio as $expressao) {
+            $instrucao .= ' ' . implode(' ', $expressao); // Monta a cláusula WHERE
         }
-
-        if(!empty($ordem)) {
-            $instrucao .= " ORDER BY $ordem ";
-        }
-
-        return $instrucao;
     }
+
+    // Adiciona a cláusula ORDER BY, se houver
+    if(!empty($ordem)) {
+        $instrucao .= " ORDER BY $ordem ";
+    }
+
+    return $instrucao; // Retorna a instrução SQL
+}
 ?>

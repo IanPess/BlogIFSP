@@ -1,68 +1,74 @@
 <?php
-    session_start();
-    require_once '../includes/valida_login.php';
-    require_once '../includes/funcoes.php';
-    require_once 'conexao_mysql.php';
-    require_once 'sql.php';
-    require_once 'mysql.php';
-    
-    foreach($_POST as $indice => $dado) {
-        $$indice = limparDados($dado);
-    }
+session_start(); // Inicia a sessão para gerenciar dados do usuário
+require_once '../includes/valida_login.php'; // Inclui validação de login
+require_once '../includes/funcoes.php'; // Inclui funções auxiliares
+require_once 'conexao_mysql.php'; // Inclui a conexão com o banco de dados
+require_once 'sql.php'; // Inclui funções para manipulação de SQL
+require_once 'mysql.php'; // Inclui funções específicas para o MySQL
 
-    foreach($_GET as $indice => $dado) {
-        $$indice = limparDados($dado);
-    }
+// Limpa e atribui dados recebidos pelo método POST
+foreach($_POST as $indice => $dado) {
+    $$indice = limparDados($dado); // Limpa os dados para prevenir injeções
+}
 
-    $id = (int)$id;
+// Limpa e atribui dados recebidos pelo método GET
+foreach($_GET as $indice => $dado) {
+    $$indice = limparDados($dado);
+}
 
-    switch($acao) {
-        case 'insert':
-            $dados = [
-                'titulo' => $titulo,
-                'texto' => $texto,
-                'data_postagem' => "$data_postagem $hora_postagem",
-                'usuario_id' => $_SESSION['login']['usuario']['id']
-            ];
+// Converte o ID para um inteiro
+$id = (int)$id;
 
-            insere (
-                'post',
-                $dados
-            );
+switch($acao) { // Decide a ação a ser realizada
+    case 'insert': // Inserção de um novo post
+        $dados = [
+            'titulo' => $titulo,
+            'texto' => $texto,
+            'data_postagem' => "$data_postagem $hora_postagem", // Combina data e hora
+            'usuario_id' => $_SESSION['login']['usuario']['id'] // Obtém o ID do usuário logado
+        ];
 
-            break;
-        case 'update':
-            $dados = [
-                'titulo' => $titulo,
-                'texto' => $texto,
-                'data_postagem' => "$data_postagem $hora_postagem",
-                'usuario_id' => $_SESSION['login']['usuario']['id']
-            ];
+        insere (
+            'post', // Nome da tabela
+            $dados // Dados a serem inseridos
+        );
 
-            $criterio = [
-                ['id', '=', $id]
-            ];
+        break;
+        
+    case 'update': // Atualização de um post existente
+        $dados = [
+            'titulo' => $titulo,
+            'texto' => $texto,
+            'data_postagem' => "$data_postagem $hora_postagem", // Combina data e hora
+            'usuario_id' => $_SESSION['login']['usuario']['id'] // Obtém o ID do usuário logado
+        ];
 
-            atualiza (
-                'post',
-                $dados,
-                $criterio
-            );
+        $criterio = [
+            ['id', '=', $id] // Define o critério para atualizar o post correto
+        ];
 
-            break;
-        case 'delete':
-            $criterio = [
-                ['id', '=', $id]
-            ];
+        atualiza (
+            'post', // Nome da tabela
+            $dados, // Dados a serem atualizados
+            $criterio // Critério de atualização
+        );
 
-            deleta (
-                'post',
-                $criterio
-            );
+        break;
 
-            break;
-    }
+    case 'delete': // Deletar um post
+        $criterio = [
+            ['id', '=', $id] // Define o critério para deletar o post correto
+        ];
 
-    header('Location: ../index.php');
-    
+        deleta (
+            'post', // Nome da tabela
+            $criterio // Critério de deleção
+        );
+
+        break;
+}
+
+// Redireciona o usuário de volta para a página inicial
+header('Location: ../index.php');
+
 ?>
